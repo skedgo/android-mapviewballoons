@@ -15,22 +15,15 @@
 
 package com.readystatesoftware.mapviewballoons;
 
-import java.util.List;
-
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup.LayoutParams;
+import com.google.android.maps.*;
 
-import com.google.android.maps.GeoPoint;
-import com.google.android.maps.ItemizedOverlay;
-import com.google.android.maps.MapController;
-import com.google.android.maps.MapView;
-import com.google.android.maps.Overlay;
-import com.google.android.maps.OverlayItem;
+import java.util.List;
 
 /**
  * An abstract extension of ItemizedOverlay for displaying an information balloon
@@ -319,20 +312,24 @@ public abstract class BalloonItemizedOverlay<Item extends OverlayItem> extends I
 			balloonView.setData(currentFocusedItem);
 		
 		GeoPoint point = currentFocusedItem.getPoint();
-		MapView.LayoutParams params = new MapView.LayoutParams(
-				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, point,
-				MapView.LayoutParams.BOTTOM_CENTER);
-		params.mode = MapView.LayoutParams.MODE_MAP;
-		
+		MapView.LayoutParams params = onGetLayoutParams(currentFocusedItem);
 		balloonView.setVisibility(View.VISIBLE);
-		
+
 		if (isRecycled) {
 			balloonView.setLayoutParams(params);
 		} else {
 			mapView.addView(balloonView, params);
 		}
-		
+
 		return isRecycled;
+	}
+
+	protected MapView.LayoutParams onGetLayoutParams(Item item) {
+		MapView.LayoutParams params = new MapView.LayoutParams (
+				MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT, item.getPoint(),
+				MapView.LayoutParams.BOTTOM_CENTER);
+		params.mode = MapView.LayoutParams.MODE_MAP;
+		return params;
 	}
 	
 	public void setShowClose(boolean showClose) {
